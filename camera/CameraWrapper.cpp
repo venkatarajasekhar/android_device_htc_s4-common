@@ -102,7 +102,6 @@ static char * camera_fixup_getparams(int id, const char * settings)
     android::String8 strParams = params.flatten();
     char *ret = strdup(strParams.string());
 
-    ALOGI("%s: get parameters fixed up", __FUNCTION__);
     return ret;
 }
 
@@ -118,7 +117,6 @@ char * camera_fixup_setparams(int id, const char * settings)
     android::String8 strParams = params.flatten();
     char *ret = strdup(strParams.string());
 
-    ALOGI("%s: set parameters fixed up", __FUNCTION__);
     return ret;
 }
 
@@ -321,6 +319,7 @@ int camera_cancel_picture(struct camera_device * device)
     return VENDOR_CALL(device, cancel_picture);
 }
 
+#define LOG_BUF_LEN 1024
 int camera_set_parameters(struct camera_device * device, const char *params)
 {
     ALOGV("%s", __FUNCTION__);
@@ -329,11 +328,19 @@ int camera_set_parameters(struct camera_device * device, const char *params)
     if (!device)
         return -EINVAL;
 
+    int i;
+    char log_buf[LOG_BUF_LEN + 1];
     char *tmp = NULL;
     tmp = camera_fixup_setparams(CAMERA_ID(device), params);
 
 #ifdef LOG_PARAMETERS
-    __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, tmp);
+    ALOGI("%s: post-fixup", __func__);
+    for (i = 0; i < (strlen(tmp) / LOG_BUF_LEN); i++) {
+        memset(log_buf, 0, LOG_BUF_LEN + 1);
+        strncpy(log_buf, tmp + (i * LOG_BUF_LEN), LOG_BUF_LEN);
+        __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, log_buf);
+    }
+    __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, tmp + (i * LOG_BUF_LEN));
 #endif
 
     int ret = VENDOR_CALL(device, set_parameters, tmp);
@@ -348,10 +355,18 @@ char* camera_get_parameters(struct camera_device * device)
     if (!device)
         return NULL;
 
+    int i;
+    char log_buf[LOG_BUF_LEN + 1];
     char *params = VENDOR_CALL(device, get_parameters);
 
 #ifdef LOG_PARAMETERS
-    __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, params);
+    ALOGI("%s: pre-fixup", __func__);
+    for (i = 0; i < (strlen(params) / LOG_BUF_LEN); i++) {
+        memset(log_buf, 0, LOG_BUF_LEN + 1);
+        strncpy(log_buf, params + (i * LOG_BUF_LEN), LOG_BUF_LEN);
+        __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, log_buf);
+    }
+    __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, params + (i * LOG_BUF_LEN));
 #endif
 
     char *tmp = camera_fixup_getparams(CAMERA_ID(device), params);
@@ -359,7 +374,13 @@ char* camera_get_parameters(struct camera_device * device)
     params = tmp;
 
 #ifdef LOG_PARAMETERS
-    __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, params);
+    ALOGI("%s: post-fixup", __func__);
+    for (i = 0; i < (strlen(params) / LOG_BUF_LEN); i++) {
+        memset(log_buf, 0, LOG_BUF_LEN + 1);
+        strncpy(log_buf, params + (i * LOG_BUF_LEN), LOG_BUF_LEN);
+        __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, log_buf);
+    }
+    __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, params + (i * LOG_BUF_LEN));
 #endif
 
     return params;
