@@ -61,6 +61,14 @@ typedef struct
                                                  's' for string,
                                                  'f' for float */
 } loc_param_s_type;
+typedef struct loc_param_v_type
+{
+   char* param_name;
+
+   char* param_str_value;
+   int param_int_value;
+   double param_double_value;
+}loc_param_v_type;
 
 /*=============================================================================
  *
