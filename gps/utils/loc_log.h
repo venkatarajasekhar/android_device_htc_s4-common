@@ -49,6 +49,16 @@ typedef struct
 
 #define CHECK_MASK(type, value, mask_var, mask) \
    ((mask_var & mask) ? (type) value : (type) (-1))
+static loc_name_val_s_type loc_msg_q_status[] =
+{
+    NAME_VAL( eMSG_Q_SUCCESS ),
+    NAME_VAL( eMSG_Q_FAILURE_GENERAL ),
+    NAME_VAL( eMSG_Q_INVALID_PARAMETER ),
+    NAME_VAL( eMSG_Q_INVALID_HANDLE ),
+    NAME_VAL( eMSG_Q_UNAVAILABLE_RESOURCE ),
+    NAME_VAL( eMSG_Q_INSUFFICIENT_BUFFER )
+};
+static int loc_msg_q_status_num = sizeof(loc_msg_q_status) / sizeof(loc_name_val_s_type);
 
 /* Get names from value */
 const char* loc_get_name_from_mask(loc_name_val_s_type table[], int table_size, long mask);
