@@ -104,7 +104,7 @@ void trim_space(char *org_string)
 {
    char *scan_ptr, *write_ptr;
    char *first_nonspace = NULL, *last_nonspace = NULL;
-
+   if(org_string){
    scan_ptr = write_ptr = org_string;
 
    while (*scan_ptr)
@@ -127,16 +127,10 @@ void trim_space(char *org_string)
    }
 
    if (last_nonspace) { *last_nonspace = '\0'; }
+   }
+   return;
 }
 
-typedef struct loc_param_v_type
-{
-   char* param_name;
-
-   char* param_str_value;
-   int param_int_value;
-   double param_double_value;
-}loc_param_v_type;
 
 /*===========================================================================
 FUNCTION loc_set_config_entry
@@ -185,7 +179,8 @@ void loc_set_config_entry(loc_param_s_type* config_entry, loc_param_v_type* conf
          /* Log INI values */
          LOC_LOGD("%s: PARAM %s = %s", __FUNCTION__, config_entry->param_name, (char*)config_entry->param_ptr);
 
-         if(NULL != config_entry->param_set)
+        // if(NULL != config_entry->param_set)
+         if(config_entry->param_set != NULL)
          {
             *(config_entry->param_set) = 1;
          }
@@ -261,7 +256,8 @@ void loc_read_conf(const char* conf_file_name, loc_param_s_type* config_table, u
    /* Clear all validity bits */
    for(i = 0; NULL != config_table && i < table_length; i++)
    {
-      if(NULL != config_table[i].param_set)
+      //if(NULL != config_table[i].param_set)
+      if(config_table[i].param_set != NULL)
       {
          *(config_table[i].param_set) = 0;
       }
@@ -292,7 +288,7 @@ void loc_read_conf(const char* conf_file_name, loc_param_s_type* config_table, u
          config_value.param_int_value = atoi(config_value.param_str_value); /* dec */
       }
 
-      for(i = 0; NULL != config_table && i < table_length; i++)
+      for(i = 0; config_table != NULL && i < table_length; i++)
       {
          loc_set_config_entry(&config_table[i], &config_value);
       }
