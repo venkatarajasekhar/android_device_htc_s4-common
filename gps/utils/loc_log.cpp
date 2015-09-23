@@ -77,18 +77,6 @@ const char* loc_get_name_from_val(loc_name_val_s_type table[], int table_size, l
    }
    return UNKNOWN_STR;
 }
-
-static loc_name_val_s_type loc_msg_q_status[] =
-{
-    NAME_VAL( eMSG_Q_SUCCESS ),
-    NAME_VAL( eMSG_Q_FAILURE_GENERAL ),
-    NAME_VAL( eMSG_Q_INVALID_PARAMETER ),
-    NAME_VAL( eMSG_Q_INVALID_HANDLE ),
-    NAME_VAL( eMSG_Q_UNAVAILABLE_RESOURCE ),
-    NAME_VAL( eMSG_Q_INSUFFICIENT_BUFFER )
-};
-static int loc_msg_q_status_num = sizeof(loc_msg_q_status) / sizeof(loc_name_val_s_type);
-
 /* Find msg_q status name */
 const char* loc_get_msg_q_status(int status)
 {
