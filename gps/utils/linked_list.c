@@ -57,15 +57,16 @@ typedef struct list_state {
   ===========================================================================*/
 linked_list_err_type linked_list_init(void** list_data)
 {
+   list_state* tmp_list = NULL;
    if( list_data == NULL )
    {
       LOC_LOGE("%s: Invalid list parameter!\n", __FUNCTION__);
       return eLINKED_LIST_INVALID_PARAMETER;
    }
 
-   list_state* tmp_list;
+   
    tmp_list = (list_state*)calloc(1, sizeof(list_state));
-   if( tmp_list == NULL )
+   if( tmp_list)
    {
       LOC_LOGE("%s: Unable to allocate space for list!\n", __FUNCTION__);
       return eLINKED_LIST_FAILURE_GENERAL;
@@ -86,13 +87,14 @@ linked_list_err_type linked_list_init(void** list_data)
   ===========================================================================*/
 linked_list_err_type linked_list_destroy(void** list_data)
 {
+   list_state* p_list = NULL;
    if( list_data == NULL )
    {
       LOC_LOGE("%s: Invalid list parameter!\n", __FUNCTION__);
       return eLINKED_LIST_INVALID_HANDLE;
    }
 
-   list_state* p_list = (list_state*)*list_data;
+   p_list = (list_state*)*list_data;
 
    linked_list_flush(p_list);
 
@@ -109,6 +111,10 @@ linked_list_err_type linked_list_destroy(void** list_data)
   ===========================================================================*/
 linked_list_err_type linked_list_add(void* list_data, void *data_obj, void (*dealloc)(void*))
 {
+   list_state* p_list = NULL;
+   list_element* elem = NULL;
+   list_element* tmp = NULL;
+   
    LOC_LOGD("%s: Adding to list data_obj = 0x%08X\n", __FUNCTION__, data_obj);
    if( list_data == NULL )
    {
@@ -122,8 +128,8 @@ linked_list_err_type linked_list_add(void* list_data, void *data_obj, void (*dea
       return eLINKED_LIST_INVALID_PARAMETER;
    }
 
-   list_state* p_list = (list_state*)list_data;
-   list_element* elem = (list_element*)malloc(sizeof(list_element));
+   p_list = (list_state*)list_data;
+   elem = (list_element*)malloc(sizeof(list_element));
    if( elem == NULL )
    {
       LOC_LOGE("%s: Memory allocation failed\n", __FUNCTION__);
@@ -137,7 +143,7 @@ linked_list_err_type linked_list_add(void* list_data, void *data_obj, void (*dea
    elem->dealloc_func = dealloc;
 
    /* Replace head element */
-   list_element* tmp = p_list->p_head;
+   tmp = p_list->p_head;
    p_list->p_head = elem;
    /* Point next to the previous head element */
    p_list->p_head->next = tmp;
@@ -161,6 +167,8 @@ linked_list_err_type linked_list_add(void* list_data, void *data_obj, void (*dea
   ===========================================================================*/
 linked_list_err_type linked_list_remove(void* list_data, void **data_obj)
 {
+   list_state* p_list = NULL;
+   list_element* tmp = NULL;
    LOC_LOGD("%s: Removing from list\n", __FUNCTION__);
    if( list_data == NULL )
    {
@@ -174,13 +182,13 @@ linked_list_err_type linked_list_remove(void* list_data, void **data_obj)
       return eLINKED_LIST_INVALID_PARAMETER;
    }
 
-   list_state* p_list = (list_state*)list_data;
+   p_list = (list_state*)list_data;
    if( p_list->p_tail == NULL )
    {
       return eLINKED_LIST_UNAVAILABLE_RESOURCE;
    }
 
-   list_element* tmp = p_list->p_tail;
+   tmp = p_list->p_tail;
 
    /* Replace tail element */
    p_list->p_tail = tmp->prev;
@@ -199,7 +207,7 @@ linked_list_err_type linked_list_remove(void* list_data, void **data_obj)
 
    /* Free allocated list element */
    free(tmp);
-
+   tmp = NULL;
    return eLINKED_LIST_SUCCESS;
 }
 
@@ -229,18 +237,21 @@ int linked_list_empty(void* list_data)
   ===========================================================================*/
 linked_list_err_type linked_list_flush(void* list_data)
 {
+   list_state* p_list = NULL;
+   list_element* tmp = NULL;
+   
    if( list_data == NULL )
    {
       LOC_LOGE("%s: Invalid list parameter!\n", __FUNCTION__);
       return eLINKED_LIST_INVALID_HANDLE;
    }
 
-   list_state* p_list = (list_state*)list_data;
+    p_list = (list_state*)list_data;
 
    /* Remove all dynamically allocated elements */
    while( p_list->p_head != NULL )
    {
-      list_element* tmp = p_list->p_head->next;
+      tmp = p_list->p_head->next;
 
       /* Free data pointer if told to do so. */
       if( p_list->p_head->dealloc_func != NULL )
@@ -250,7 +261,6 @@ linked_list_err_type linked_list_flush(void* list_data)
 
       /* Free list element */
       free(p_list->p_head);
-
       p_list->p_head = tmp;
    }
 
@@ -268,6 +278,8 @@ linked_list_err_type linked_list_search(void* list_data, void **data_p,
                                         bool (*equal)(void* data_0, void* data),
                                         void* data_0, bool rm_if_found)
 {
+   list_element* tmp = NULL;
+   list_state* p_list = NULL;
    LOC_LOGD("%s: Search the list\n", __FUNCTION__);
    if( list_data == NULL || NULL == equal )
    {
@@ -276,13 +288,13 @@ linked_list_err_type linked_list_search(void* list_data, void **data_p,
       return eLINKED_LIST_INVALID_HANDLE;
    }
 
-   list_state* p_list = (list_state*)list_data;
+   p_list = (list_state*)list_data;
    if( p_list->p_tail == NULL )
    {
       return eLINKED_LIST_UNAVAILABLE_RESOURCE;
    }
 
-   list_element* tmp = p_list->p_head;
+   tmp = p_list->p_head;
 
    if (NULL != data_p) {
      *data_p = NULL;
@@ -295,13 +307,15 @@ linked_list_err_type linked_list_search(void* list_data, void **data_p,
        }
 
        if (rm_if_found) {
-         if (NULL == tmp->prev) {
+        // if (NULL == tmp->prev) {
+        if (tmp->prev == NULL) {
            p_list->p_head = tmp->next;
          } else {
            tmp->prev->next = tmp->next;
          }
 
-         if (NULL == tmp->next) {
+        // if (NULL == tmp->next) {
+         if (tmp->next == NULL) {
            p_list->p_tail = tmp->prev;
          } else {
            tmp->next->prev = tmp->prev;
@@ -311,7 +325,8 @@ linked_list_err_type linked_list_search(void* list_data, void **data_p,
 
          // dealloc data if it is not copied out && caller
          // has given us a dealloc function pointer.
-         if (NULL == data_p && NULL != tmp->dealloc_func) {
+       //  if (NULL == data_p && NULL != tmp->dealloc_func) {
+           if (data_p == NULL && tmp->dealloc_funcn !=NULL) {
              tmp->dealloc_func(tmp->data_ptr);
          }
          free(tmp);
