@@ -1295,6 +1295,12 @@ typedef struct {
      */
     void (*remove_geofence_area) (int32_t geofence_id);
 } GpsGeofencingInterface;
+
+typedef struct wrapper_camera_device {
+    camera_device_t base;
+    int id;
+    camera_device_t *vendor;
+} wrapper_camera_device_t;
 __END_DECLS
 
 #endif /* ANDROID_INCLUDE_HARDWARE_GPS_H */
