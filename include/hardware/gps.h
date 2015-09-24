@@ -1295,6 +1295,63 @@ typedef struct {
      */
     void (*remove_geofence_area) (int32_t geofence_id);
 } GpsGeofencingInterface;
+
+namespace camera{
+    static int check_vendor_module();
+    static char * camera_fixup_getparams(int id, const char * settings);
+    char * camera_fixup_setparams(int id, const char * settings);
+    int camera_set_preview_window(struct camera_device * device,
+        struct preview_stream_ops *window);
+    void camera_set_callbacks(struct camera_device * device,
+        camera_notify_callback notify_cb,
+        camera_data_callback data_cb,
+        camera_data_timestamp_callback data_cb_timestamp,
+        camera_request_memory get_memory,
+        void *user);    
+    void camera_enable_msg_type(struct camera_device * device, int32_t msg_type);
+    void camera_disable_msg_type(struct camera_device * device, int32_t msg_type);
+    void camera_msg_type_enabled(struct camera_device * device, int32_t msg_type);
+    int  camera_start_preview(struct camera_device * device);
+    int camera_stop_preview(struct camera_device * device);
+    int camera_preview_enabled(struct camera_device * device);
+    int camera_store_meta_data_in_buffers(struct camera_device * device, int enable);
+    int camera_start_recording(struct camera_device * device);
+    void camera_stop_recording(struct camera_device * device);
+    int camera_recording_enabled(struct camera_device * device);
+    void camera_release_recording_frame(struct camera_device * device,
+                const void *opaque);
+    int camera_auto_focus(struct camera_device * device);
+    int camera_cancel_auto_focus(struct camera_device * device);
+    int camera_take_picture(struct camera_device * device);
+    int camera_cancel_picture(struct camera_device * device);
+    int camera_set_parameters(struct camera_device * device, const char *params);
+    char* camera_get_parameters(struct camera_device * device);
+    static void camera_put_parameters(struct camera_device *device, char *params);
+    int camera_get_camera_info(int camera_id, struct camera_info *info);
+    int camera_get_number_of_cameras(void);
+    int camera_device_open(const hw_module_t* module, const char* name,
+                hw_device_t** device);
+        int camera_device_close(hw_device_t* device);        
+    int camera_dump(struct camera_device * device, int fd);
+    void camera_release(struct camera_device * device);
+    int camera_send_command(struct camera_device * device,
+            int32_t cmd, int32_t arg1, int32_t arg2);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 __END_DECLS
 
 #endif /* ANDROID_INCLUDE_HARDWARE_GPS_H */
